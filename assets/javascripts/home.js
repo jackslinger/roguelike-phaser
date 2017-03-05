@@ -40,6 +40,7 @@ homeState = {
     keyboard.e = game.input.keyboard.addKey(Phaser.Keyboard.E);
     keyboard.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
     keyboard.b = game.input.keyboard.addKey(Phaser.Keyboard.B);
+    keyboard.esc = game.input.keyboard.addKey(Phaser.Keyboard.ESC);
     blocking = 0;
     blocking_timeout = 15;
     input_mode = 'movement';
@@ -103,6 +104,9 @@ homeState = {
       } else if (keyboard.b.isDown) {
         input_mode = 'seeds';
         inventoryItems.visible = false;
+      } else if (keyboard.esc.isDown) {
+        input_mode = 'movement';
+        inventoryItems.visible = false;
       }
     }
 
@@ -127,7 +131,9 @@ homeState = {
     }
 
     function processActionInput(action) {
-      if (keyboard.left.isDown) {
+      if (keyboard.esc.isDown) {
+        input_mode = 'movement'
+      } else if (keyboard.left.isDown) {
         if (player.x >= TILE_WIDTH) {
           action((player.x / TILE_WIDTH) - 1, player.y / TILE_HEIGHT)
           input_mode = 'movement';
