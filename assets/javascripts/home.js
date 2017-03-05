@@ -1,7 +1,21 @@
 homeState = {
   create: function () {
+    var map = [];
+    for (var col_index = 0; col_index < SCREEN_WIDTH_TILES; col_index++) {
+      var row = [];
+      for (var row_index = 0; row_index < SCREEN_HEIGHT_TILES; row_index++) {
+        var sprite = this.add.sprite(col_index * TILE_WIDTH, row_index * TILE_HEIGHT, 'home_tiles');
+        sprite.frameName = 'radiation';
+        row.push(sprite);
+      }
+      map.push(row);
+    }
+
+    map[2][3].frameName = 'crop0';
+    map[2][4].frameName = 'crop0';
+
+
     this.stage.backgroundColor = "#FFFFFF";
-    this.add.sprite(2 * TILE_WIDTH, 1 * TILE_HEIGHT, 'crop0');
 
     player = this.add.sprite(16, 16, 'face');
     keyboard = this.input.keyboard.createCursorKeys();

@@ -1,0 +1,60 @@
+{"frames": {
+
+"crop0":
+{
+	"frame": {"x":0,"y":0,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"crop1":
+{
+	"frame": {"x":16,"y":0,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"crop2":
+{
+	"frame": {"x":32,"y":0,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"crop3":
+{
+	"frame": {"x":48,"y":0,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"radiation":
+{
+	"frame": {"x":64,"y":0,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"water":
+{
+	"frame": {"x":80,"y":0,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "home_tiles.png",
+	"format": "RGBA8888",
+	"size": {"w":96,"h":16},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:46379acb7ddca900dcbcc0b448ce5857:11d4a4ce8186d1e517544aadc30ede8e:dd342a2a7232f39ba26b1effa5bee2f1$"
+}
+}
