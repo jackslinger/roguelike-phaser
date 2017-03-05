@@ -1,13 +1,12 @@
-TILE_WIDTH = 16;
-TILE_HEIGHT = 16;
-SCREEN_WIDTH_TILES = 50;
-SCREEN_HEIGHT_TILES = 35;
+TILE_WIDTH = 32;
+TILE_HEIGHT = 32;
+SCREEN_WIDTH_TILES = 40;
+SCREEN_HEIGHT_TILES = 16;
 
 var game = new Phaser.Game(TILE_WIDTH * SCREEN_WIDTH_TILES, TILE_HEIGHT * SCREEN_HEIGHT_TILES, Phaser.AUTO, 'phaser', {});
 
 game_state = {
   create: function() {
-    game.stage.backgroundColor = "#FFFFFF";
 
     var map = [];
     for (var col_index = 0; col_index < SCREEN_WIDTH_TILES; col_index++) {
@@ -68,5 +67,6 @@ game_state = {
 
 game.state.add('game_state', game_state);
 game.state.add('home_state', homeState);
+game.state.add('dungeon_state', dungeonState);
 game.state.add('preloader', preloaderState);
 game.state.start('preloader');
