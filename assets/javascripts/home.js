@@ -11,13 +11,18 @@ homeState = {
       game.map.push(row);
     }
 
-    game.map[2][3].frameName = 'crop0';
-    game.map[2][4].frameName = 'crop0';
-
+    game.map[39][30].frameName = 'water';
+    game.map[39][31].frameName = 'water';
+    game.map[40][29].frameName = 'water';
+    game.map[40][30].frameName = 'water';
+    game.map[40][31].frameName = 'water';
+    game.map[41][29].frameName = 'water';
+    game.map[41][30].frameName = 'water';
+    game.map[41][31].frameName = 'water';
 
     this.stage.backgroundColor = "#FFFFFF";
 
-    player = this.add.sprite(16, 16, 'face');
+    player = this.add.sprite((35 * TILE_WIDTH), (25 * TILE_HEIGHT), 'face');
     keyboard = this.input.keyboard.createCursorKeys();
     keyboard.spacebar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     blocking = 0;
@@ -25,7 +30,7 @@ homeState = {
     input_mode = 'movement';
   },
   update: function () {
-    function processMovement() {
+    function processMovementInput() {
       if (keyboard.spacebar.isDown) {
         input_mode = 'hoe';
       } if (keyboard.left.isDown) {
@@ -72,28 +77,38 @@ homeState = {
       }
     }
 
-    function processHoe() {
+    function hoeGround(x, y) {
+      if (x >= 0 && x < SCREEN_WIDTH_TILES && y >= 0 && y < SCREEN_HEIGHT_TILES) {
+        if (game.map[x][y].frameName === 'radiation') {
+          game.map[x][y].frameName = 'crop0';
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function processHoeInput() {
       if (keyboard.left.isDown) {
         if (player.x >= TILE_WIDTH) {
-          game.map[(player.x / TILE_WIDTH) - 1][player.y / TILE_HEIGHT].frameName = 'crop0';
+          hoeGround((player.x / TILE_WIDTH) - 1, player.y / TILE_HEIGHT)
           input_mode = 'movement';
           blocking = blocking_timeout;
         }
       } else if (keyboard.right.isDown) {
         if (player.x < (SCREEN_WIDTH_TILES - 1) * TILE_WIDTH) {
-          game.map[(player.x / TILE_WIDTH) + 1][player.y / TILE_HEIGHT].frameName = 'crop0';
+          hoeGround((player.x / TILE_WIDTH) + 1, player.y / TILE_HEIGHT)
           input_mode = 'movement';
           blocking = blocking_timeout;
         }
       } else if (keyboard.up.isDown) {
         if (player.y >= TILE_HEIGHT) {
-          game.map[player.x / TILE_WIDTH][(player.y / TILE_HEIGHT) - 1].frameName = 'crop0';
+          hoeGround(player.x / TILE_WIDTH, (player.y / TILE_HEIGHT) - 1)
           input_mode = 'movement';
           blocking = blocking_timeout;
         }
       } else if (keyboard.down.isDown) {
         if (player.y < (SCREEN_HEIGHT_TILES - 1) * TILE_HEIGHT) {
-          game.map[player.x / TILE_WIDTH][(player.y / TILE_HEIGHT) + 1].frameName = 'crop0';
+          hoeGround(player.x / TILE_WIDTH, (player.y / TILE_HEIGHT) + 1)
           input_mode = 'movement';
           blocking = blocking_timeout;
         }
@@ -101,9 +116,9 @@ homeState = {
     }
 
     if (input_mode === 'movement') {
-      processMovement();
+      processMovementInput();
     } else if (input_mode === 'hoe') {
-      processHoe();
+      processHoeInput();
     }
   },
   render: function() {
