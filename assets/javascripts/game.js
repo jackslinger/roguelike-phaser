@@ -6,11 +6,6 @@ SCREEN_HEIGHT_TILES = 35;
 var game = new Phaser.Game(TILE_WIDTH * SCREEN_WIDTH_TILES, TILE_HEIGHT * SCREEN_HEIGHT_TILES, Phaser.AUTO, 'phaser', {});
 
 game_state = {
-  preload: function() {
-    this.load.image('box', 'assets/images/box.png');
-    this.load.image('cross', 'assets/images/cross.png');
-    this.load.image('face', 'assets/images/face.png');
-  },
   create: function() {
     game.stage.backgroundColor = "#FFFFFF";
 
@@ -72,4 +67,6 @@ game_state = {
 }
 
 game.state.add('game_state', game_state);
-game.state.start('game_state')
+game.state.add('home_state', homeState);
+game.state.add('preloader', preloaderState);
+game.state.start('preloader');
