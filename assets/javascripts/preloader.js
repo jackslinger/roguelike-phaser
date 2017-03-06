@@ -2,6 +2,7 @@ preloaderState = {
   preload: function() {
     this.load.atlasJSONHash('home_tiles', 'assets/images/home_tiles.png', 'assets/images/home_tiles.json');
     this.load.atlasJSONHash('dungeon_tiles', 'assets/images/dungeon.png', 'assets/images/dungeon.json');
+    this.load.atlasJSONHash('dungeon_tiles16', 'assets/images/dungeon16.png', 'assets/images/dungeon16.json');
 
     this.load.image('box', 'assets/images/box.png');
     this.load.image('cross', 'assets/images/cross.png');

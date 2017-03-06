@@ -1,9 +1,9 @@
-TILE_WIDTH = 32;
-TILE_HEIGHT = 32;
-SCREEN_WIDTH_TILES = 40;
-SCREEN_HEIGHT_TILES = 16;
+TILE_WIDTH = 16;
+TILE_HEIGHT = 16;
+SCREEN_WIDTH = 50 * TILE_WIDTH;
+SCREEN_HEIGHT = 30 * TILE_HEIGHT;
 
-var game = new Phaser.Game(TILE_WIDTH * SCREEN_WIDTH_TILES, TILE_HEIGHT * SCREEN_HEIGHT_TILES, Phaser.AUTO, 'phaser', {});
+var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'phaser', {});
 
 game_state = {
   create: function() {
