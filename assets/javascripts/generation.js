@@ -5,7 +5,7 @@ var Map = function(state, width, height) {
   this.tiles = [];
 }
 
-Map.prototype.generate = function() {
+Map.prototype.generate = function(player) {
   root_container = new Container(0, 0, this.width, this.height);
   tree = splitContainer(root_container, 4);
 
@@ -20,11 +20,16 @@ Map.prototype.generate = function() {
   this.wallEdges();
 
   this.generateMaze(rooms);
+  player.x = (rooms[0].x + 1) * TILE_WIDTH;
+  player.y = (rooms[0].y + 1) * TILE_HEIGHT;
   for (var i = 0; i < rooms.length; i++) {
     this.connectRoom(rooms[i]);
   }
 
   this.finalise();
+
+  var lastRoom = rooms[rooms.length - 1];
+  this.tiles[lastRoom.x + 1][lastRoom.y + 1].sprite.frameName = 'box';
 }
 
 Map.prototype.carveRoom = function(room) {
@@ -36,19 +41,20 @@ Map.prototype.carveRoom = function(room) {
         tile.blocksMovement = true;
         tile.sprite.frameName = 'wall';
       } else {
+        tile.blocksMovement = false;
         tile.sprite.frameName = 'white';
       }
     }
   }
 }
 
-Map.prototype.fillWithTile = function(tileSet, tileName) {
+Map.prototype.fillWithTile = function(tileSet, tileName, blocksMovement) {
   for (var col_index = 0; col_index < this.width; col_index++) {
     var row = [];
     for (var row_index = 0; row_index < this.height; row_index++) {
       var sprite = this.state.add.sprite(col_index * TILE_WIDTH, row_index * TILE_HEIGHT, tileSet);
       sprite.frameName = tileName;
-      var tile = new Tile(sprite, col_index, row_index, false);
+      var tile = new Tile(sprite, col_index, row_index, blocksMovement);
       row.push(tile)
     }
     this.tiles.push(row);
@@ -184,6 +190,7 @@ Map.prototype.connectRoom = function(room) {
 
   for (var i = 0; i < connections; i++) {
     var randomWall = walls.splice(getRandomInt(1, walls.length - 1), 1)[0];
+    randomWall.blocksMovement = false;
     randomWall.sprite.frameName = 'white';
   }
 }
@@ -193,6 +200,7 @@ Map.prototype.finalise = function() {
     for (var row_index = 0; row_index < DUNGEON_HEIGHT; row_index++) {
       var tile = this.tiles[col_index][row_index];
       if (tile.sprite.frameName === 'cross') {
+        tile.blocksMovement = false;
         tile.sprite.frameName = 'white';
       }
     }

@@ -5,27 +5,30 @@ MIN_BSP_SPLIT = 6;
 dungeonState = {
   create: function () {
     map = new Map(this, DUNGEON_WIDTH, DUNGEON_HEIGHT);
-    map.fillWithTile('dungeon_tiles16', 'wall');
-    map.generate();
+    map.fillWithTile('dungeon_tiles16', 'wall', true);
+
+    player = this.add.sprite((3 * TILE_WIDTH), (3 * TILE_HEIGHT), 'face');
+    game.camera.follow(player);
+
+    map.generate(player);
 
     this.world.setBounds(0, 0, DUNGEON_WIDTH * TILE_WIDTH, DUNGEON_HEIGHT * TILE_HEIGHT);
 
     // These global variables probably need linking to the state
-    player = this.add.sprite((3 * TILE_WIDTH), (3 * TILE_HEIGHT), 'face');
-    game.camera.follow(player);
+
     keyboard = this.input.keyboard.createCursorKeys();
     blocking = 0;
-    blocking_timeout = 5;
+    blocking_timeout = 10;
     input_mode = 'movement';
   },
   update: function () {
     function movePlayer(x, y) {
       if (x >= 0 && x < DUNGEON_WIDTH && y >= 0 && y < DUNGEON_HEIGHT) {
-        // if (map[x][y].blocksMovement === false) {
-        player.x = x * TILE_WIDTH;
-        player.y = y * TILE_HEIGHT;
-        return true;
-        // }
+        if (map.tiles[x][y].blocksMovement === false) {
+          player.x = x * TILE_WIDTH;
+          player.y = y * TILE_HEIGHT;
+          return true;
+        }
       }
       return false;
     }
