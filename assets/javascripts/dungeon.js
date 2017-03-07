@@ -5,7 +5,7 @@ MIN_BSP_SPLIT = 6;
 dungeonState = {
   create: function () {
     map = new Map(this, DUNGEON_WIDTH, DUNGEON_HEIGHT);
-    map.fillWithTile('dungeon_tiles16', 'white');
+    map.fillWithTile('dungeon_tiles16', 'wall');
     map.generate();
 
     this.world.setBounds(0, 0, DUNGEON_WIDTH * TILE_WIDTH, DUNGEON_HEIGHT * TILE_HEIGHT);

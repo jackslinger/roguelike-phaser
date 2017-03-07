@@ -9,28 +9,34 @@ Map.prototype.generate = function() {
   root_container = new Container(0, 0, this.width, this.height);
   tree = splitContainer(root_container, 4);
 
-  var containers = tree.getLeafs()
+  var containers = tree.getLeafs();
+  var rooms = [];
   for(var i = 0; i < containers.length; i++) {
     var room = getRoomWithinContainer(containers[i]);
+    rooms.push(room);
     this.carveRoom(room);
   }
 
   this.wallEdges();
 
-  this.generateMaze();
+  this.generateMaze(rooms);
+  for (var i = 0; i < rooms.length; i++) {
+    this.connectRoom(rooms[i]);
+  }
+
   this.finalise();
-  // this.moo();
 }
 
 Map.prototype.carveRoom = function(room) {
   for (var col_index = room.x; col_index < (room.x + room.width); col_index++) {
     for (var row_index = room.y; row_index < (room.y + room.height); row_index++) {
       var tile = this.tiles[col_index][row_index];
+      tile.partOfRoom = true;
       if (col_index == room.x || col_index == (room.x + room.width - 1) || row_index == room.y || row_index == (room.y + room.height - 1)) {
         tile.blocksMovement = true;
         tile.sprite.frameName = 'wall';
       } else {
-        tile.sprite.frameName = 'box';
+        tile.sprite.frameName = 'white';
       }
     }
   }
@@ -53,14 +59,18 @@ Map.prototype.wallEdges = function() {
   for (var i = 0; i < this.width; i++) {
     this.tiles[i][0].sprite.frameName = 'wall';
     this.tiles[i][0].blocksMovement = true;
+    this.tiles[i][0].partOfRoom = true;
     this.tiles[i][this.height - 1].sprite.frameName = 'wall';
     this.tiles[i][this.height - 1].blocksMovement = true;
+    this.tiles[i][this.height - 1].partOfRoom = true;
   }
   for (var i = 0; i < this.height; i++) {
     this.tiles[0][i].sprite.frameName = 'wall';
-    this.tiles[0][i].blocksMovement = false;
+    this.tiles[0][i].blocksMovement = true;
+    this.tiles[0][i].partOfRoom = true;
     this.tiles[this.width - 1][i].sprite.frameName = 'wall';
     this.tiles[this.width - 1][i].blocksMovement = true;
+    this.tiles[this.width - 1][i].partOfRoom = true;
   }
 }
 
@@ -68,8 +78,8 @@ Map.prototype.getOrthogonalNeighbours = function(tile) {
   var neighbours = [];
   if (tile.x > 0) { neighbours.push(this.tiles[tile.x - 1][tile.y]) }
   if (tile.y > 0) { neighbours.push(this.tiles[tile.x][tile.y - 1]) }
-  if (tile.y < this.height) { neighbours.push(this.tiles[tile.x][tile.y + 1]) }
-  if (tile.x < this.width) { neighbours.push(this.tiles[tile.x + 1][tile.y]) }
+  if (tile.y < this.height - 1) { neighbours.push(this.tiles[tile.x][tile.y + 1]) }
+  if (tile.x < this.width - 1) { neighbours.push(this.tiles[tile.x + 1][tile.y]) }
   return neighbours;
 }
 
@@ -88,20 +98,34 @@ Map.prototype.getAllNeighbours = function(tile) {
   return neighbours;
 }
 
-Map.prototype.generateMaze = function() {
-  var cellList = [this.tiles[1][1]];
+Map.prototype.generateMaze = function(rooms) {
+
+  var overlap = true
+  var firstCellX;
+  var firstCellY;
+
+  while (overlap) {
+    firstCellX = getRandomInt(1, DUNGEON_WIDTH - 2)
+    firstCellY = getRandomInt(1, DUNGEON_HEIGHT - 2)
+    overlap = false;
+    for (var i = 0; i < rooms.length; i++) {
+      if (pointWithinContainer(firstCellX, firstCellY, rooms[i])) {
+        overlap = true;
+      }
+    }
+  }
+
+  var cellList = [this.tiles[firstCellX][firstCellY]];
 
   while (cellList.length > 0) {
-  // for (var moo = 0; moo <= 97; moo++) {
     // var cell = cellList.pop();
     var cell = cellList.splice(getRandomInt(0, cellList.length - 1), 1)[0];
     cell.visited = true;
-    // cell.sprite.frameName = 'box';
 
     var neighbours = this.getOrthogonalNeighbours(cell);
     var me = this;
     var available = neighbours.filter(function(neighbour) {
-      if (!(neighbour.sprite.frameName === 'white')) {
+      if (neighbour.partOfRoom === true) {
         return false;
       }
       var doubleNeighbours = me.getOrthogonalNeighbours(neighbour);
@@ -128,14 +152,39 @@ Map.prototype.generateMaze = function() {
 
 }
 
-Map.prototype.moo = function(tile) {
-  for (var col_index = 1; col_index < DUNGEON_WIDTH; col_index += 2) {
-    for (var row_index = 1; row_index < DUNGEON_HEIGHT; row_index += 2) {
-      var tile = this.tiles[col_index][row_index];
-      if (tile.sprite.frameName === 'white') {
-        this.tiles[col_index][row_index].sprite.frameName = 'cross'
+Map.prototype.connectRoom = function(room) {
+  var walls = [];
+  for (var i = room.x + 1; i < room.x + room.width - 1; i++) {
+    walls.push(this.tiles[i][room.y]);
+    walls.push(this.tiles[i][room.y + room.height - 1]);
+  }
+  for (var i = room.y + 1; i < room.y + room.height - 1; i++) {
+    walls.push(this.tiles[room.x][i]);
+    walls.push(this.tiles[room.x + room.width - 1][i]);
+  }
+
+  var me = this;
+  walls = walls.filter(function(wall) {
+    var neighbours = me.getOrthogonalNeighbours(wall);
+    var exploredNeighbours = 0;
+    for (var i = 0; i < neighbours.length; i++) {
+      var neighbour = neighbours[i];
+      if (neighbour === undefined) {
+        debugger
+      }
+      if (neighbour.sprite.frameName === 'cross') {
+        exploredNeighbours++;
       }
     }
+    return (exploredNeighbours > 0);
+  });
+
+  var maximumConnections = Math.min(3, walls.length - 1);
+  var connections = getRandomInt(1, maximumConnections);
+
+  for (var i = 0; i < connections; i++) {
+    var randomWall = walls.splice(getRandomInt(1, walls.length - 1), 1)[0];
+    randomWall.sprite.frameName = 'white';
   }
 }
 
@@ -145,10 +194,6 @@ Map.prototype.finalise = function() {
       var tile = this.tiles[col_index][row_index];
       if (tile.sprite.frameName === 'cross') {
         tile.sprite.frameName = 'white';
-      } else if (tile.sprite.frameName === 'box') {
-        tile.sprite.frameName = 'white';
-      } else if (tile.sprite.frameName === 'white') {
-        tile.sprite.frameName = 'wall';
       }
     }
   }
@@ -160,6 +205,7 @@ var Tile = function(sprite, x, y, blocksMovement) {
   this.y = y;
   this.blocksMovement = blocksMovement;
   this.visited = false;
+  this.partOfRoom = false;
 }
 
 var Container = function(x, y, w, h) {
@@ -225,4 +271,12 @@ function getRoomWithinContainer(container) {
   room.x = getRandomInt(container.x, container.x + (container.w - room.width));
   room.y = getRandomInt(container.y, container.y + (container.h - room.height));
   return room;
+}
+
+function pointWithinContainer(x, y, container) {
+  if ((x >= container.x && x < container.x + container.width)
+  && (y >= container.y && y < container.y + container.height)) {
+    return true;
+  }
+  return false;
 }
