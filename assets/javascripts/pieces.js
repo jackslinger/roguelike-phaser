@@ -24,8 +24,13 @@ var Board = function(game, map, player) {
 Board.prototype.movePiece = function(piece, dx, dy) {
   var newX = piece.x + dx;
   var newY = piece.y + dy;
-  if (newX >= 0 && newX < DUNGEON_WIDTH && newY >= 0 && newY < DUNGEON_HEIGHT) {
-    if (this.map.tiles[newX][newY].blocksMovement === false && !this.blockedByPiece(newX, newY)) {
+  if (this.map.tileClear(newX, newY)) {
+    var blockingActor = this.blockedByActor(newX, newY);
+    if (blockingActor) {
+      // Attack
+      this.removeActor(blockingActor);
+    } else {
+      // Move
       piece.x = newX;
       piece.y = newY;
       return true;
@@ -34,12 +39,26 @@ Board.prototype.movePiece = function(piece, dx, dy) {
   return false;
 }
 
-Board.prototype.blockedByPiece = function(x, y) {
+Board.prototype.blockedByActor = function(x, y) {
   for (var i = 0; i < this.monsters.length; i++) {
     var monster = this.monsters[i];
     if (monster.x == x && monster.y == y) {
-      return true;
+      return monster;
     }
   }
   return false;
+}
+
+Board.prototype.addActor = function(spriteName, x, y) {
+  var sprite = this.game.add.sprite(0, 0, spriteName);
+  var actor = new Actor(sprite, x, y);
+  this.monsters.push(actor);
+}
+
+Board.prototype.removeActor = function(actor) {
+  var index = this.monsters.indexOf(actor);
+  if (index > -1) {
+    this.monsters.splice(index, 1);
+    actor.sprite.destroy();
+  }
 }

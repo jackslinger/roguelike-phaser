@@ -18,7 +18,7 @@ dungeonState = {
     game.dungeon = new Board(game, map, player);
 
     // map.generate(player);
-    game.dungeon.monsters.push(new Actor(this.add.sprite(0, 0, 'cross'), 5, 5));
+    game.dungeon.addActor('cross', 5, 5);
 
     keyboard = this.input.keyboard.createCursorKeys();
     blocking = 0;

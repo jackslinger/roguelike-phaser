@@ -207,6 +207,13 @@ Map.prototype.finalise = function() {
   }
 }
 
+Map.prototype.tileClear = function(x, y) {
+  if (x >= 0 && x < this.width && y >= 0 && y < this.height && this.tiles[x][y].blocksMovement === false) {
+    return true;
+  }
+  return false;
+}
+
 var Tile = function(sprite, x, y, blocksMovement) {
   this.sprite = sprite;
   this.x = x;
