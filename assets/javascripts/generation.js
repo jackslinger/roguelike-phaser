@@ -6,26 +6,31 @@ var Map = function(state, width, height) {
 }
 
 Map.prototype.generate = function() {
-  // root_container = new Container(0, 0, this.width, this.height);
-  // tree = splitContainer(root_container, 4);
-  //
-  // var containers = tree.getLeafs()
-  // for(var i = 0; i < containers.length; i++) {
-  //   var room = getRoomWithinContainer(containers[i]);
-  //   this.carveRoom(room);
-  // }
+  root_container = new Container(0, 0, this.width, this.height);
+  tree = splitContainer(root_container, 4);
+
+  var containers = tree.getLeafs()
+  for(var i = 0; i < containers.length; i++) {
+    var room = getRoomWithinContainer(containers[i]);
+    this.carveRoom(room);
+  }
 
   this.wallEdges();
 
   this.generateMaze();
+  this.finalise();
+  // this.moo();
 }
 
 Map.prototype.carveRoom = function(room) {
   for (var col_index = room.x; col_index < (room.x + room.width); col_index++) {
     for (var row_index = room.y; row_index < (room.y + room.height); row_index++) {
+      var tile = this.tiles[col_index][row_index];
       if (col_index == room.x || col_index == (room.x + room.width - 1) || row_index == room.y || row_index == (room.y + room.height - 1)) {
-        var tile = this.tiles[col_index][row_index].blocksMovement = true;
-        this.tiles[col_index][row_index].sprite.frameName = 'wall';
+        tile.blocksMovement = true;
+        tile.sprite.frameName = 'wall';
+      } else {
+        tile.sprite.frameName = 'box';
       }
     }
   }
@@ -86,9 +91,12 @@ Map.prototype.getAllNeighbours = function(tile) {
 Map.prototype.generateMaze = function() {
   var cellList = [this.tiles[1][1]];
 
-  // while (cellList.length > 0) {
-  for (var moo = 0; moo < 20; moo++) {
-    var cell = cellList.pop();
+  while (cellList.length > 0) {
+  // for (var moo = 0; moo <= 97; moo++) {
+    // var cell = cellList.pop();
+    var cell = cellList.splice(getRandomInt(0, cellList.length - 1), 1)[0];
+    cell.visited = true;
+    // cell.sprite.frameName = 'box';
 
     var neighbours = this.getOrthogonalNeighbours(cell);
     var me = this;
@@ -100,7 +108,7 @@ Map.prototype.generateMaze = function() {
       var exploredNeighbours = 0;
       for (var i = 0; i < doubleNeighbours.length; i++) {
         var doubleNeighbour = doubleNeighbours[i];
-        if (doubleNeighbour.sprite.frameName === 'cross') {
+        if (doubleNeighbour.visited === true) {
           exploredNeighbours++;
         }
       }
@@ -116,48 +124,33 @@ Map.prototype.generateMaze = function() {
         cellList.push(available[i]);
       }
     }
-
-    // if (available.length > 0) {
-    //   var chosen = available[getRandomInt(0, available.length - 1)];
-    //   chosen.sprite.frameName = 'cross';
-    //   cellList.push(chosen);
-    // }
   }
-
-  // while (cellList.length > 0) {
-  //   var cell = cellList.splice(getRandomInt(0, cellList.length - 1), 1)[0];
-  //   var neighbours = this.getOrthogonalNeighbours(cell);
-  //
-  //   var exploredNeighbours = 0;
-  //   for (var i = 0; i < neighbours.length; i++) {
-  //     var neighbour = neighbours[i];
-  //     if (neighbour.sprite.frameName === 'cross') {
-  //       exploredNeighbours++;
-  //     }
-  //   }
-  //
-  //   if (exploredNeighbours < 2) {
-  //     cell.sprite.frameName = 'cross';
-  //     for (var i = 0; i < neighbours.length; i++) {
-  //       var neighbour = neighbours[i];
-  //       if (neighbour.sprite.frameName === 'white') {
-  //         cellList.push(neighbour);
-  //       }
-  //     }
-  //   }
-  // }
 
 }
 
 Map.prototype.moo = function(tile) {
-  if (tile.sprite.frameName === 'white') {
-    tile.sprite.frameName = 'cross';
-  } else {
-    return
+  for (var col_index = 1; col_index < DUNGEON_WIDTH; col_index += 2) {
+    for (var row_index = 1; row_index < DUNGEON_HEIGHT; row_index += 2) {
+      var tile = this.tiles[col_index][row_index];
+      if (tile.sprite.frameName === 'white') {
+        this.tiles[col_index][row_index].sprite.frameName = 'cross'
+      }
+    }
   }
-  var neighbours = this.getNeighbours(tile);
-  for (var i = 0; i < neighbours.length; i++) {
-    this.moo(neighbours[i]);
+}
+
+Map.prototype.finalise = function() {
+  for (var col_index = 0; col_index < DUNGEON_WIDTH; col_index++) {
+    for (var row_index = 0; row_index < DUNGEON_HEIGHT; row_index++) {
+      var tile = this.tiles[col_index][row_index];
+      if (tile.sprite.frameName === 'cross') {
+        tile.sprite.frameName = 'white';
+      } else if (tile.sprite.frameName === 'box') {
+        tile.sprite.frameName = 'white';
+      } else if (tile.sprite.frameName === 'white') {
+        tile.sprite.frameName = 'wall';
+      }
+    }
   }
 }
 
@@ -166,6 +159,7 @@ var Tile = function(sprite, x, y, blocksMovement) {
   this.x = x;
   this.y = y;
   this.blocksMovement = blocksMovement;
+  this.visited = false;
 }
 
 var Container = function(x, y, w, h) {
