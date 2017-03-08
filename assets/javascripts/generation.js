@@ -1,11 +1,24 @@
-var Map = function(state, width, height) {
+var Map = function(state, width, height, tileSet) {
   this.state = state;
   this.width = width;
   this.height = height;
+  this.tileSet = tileSet;
   this.tiles = [];
+
+  for (var col_index = 0; col_index < this.width; col_index++) {
+    var row = [];
+    for (var row_index = 0; row_index < this.height; row_index++) {
+      var sprite = this.state.add.sprite(col_index * TILE_WIDTH, row_index * TILE_HEIGHT, tileSet);
+      row.push(new Tile(sprite, col_index, row_index, false));
+    }
+    this.tiles.push(row);
+  }
 }
 
 Map.prototype.generate = function(player) {
+  this.fillWithTile('wall', true);
+  this.wallEdges();
+
   root_container = new Container(0, 0, this.width, this.height);
   tree = splitContainer(root_container, 4);
 
@@ -17,8 +30,6 @@ Map.prototype.generate = function(player) {
     this.carveRoom(room);
   }
 
-  this.wallEdges();
-
   this.generateMaze(rooms);
   for (var i = 0; i < rooms.length; i++) {
     var room = rooms[i];
@@ -26,15 +37,16 @@ Map.prototype.generate = function(player) {
     if (i === 0) {
       player.x = (room.x + 1);
       player.y = (room.y + 1);
+      this.stairX = room.x + 2;
+      this.stairY = room.y + 2;
+      this.tiles[this.stairX][this.stairY].sprite.frameName = 'box';
+    } else if (i === rooms.length - 1) {
     } else {
       this.populateRoom(room);
     }
   }
 
   this.finalise();
-
-  // var lastRoom = rooms[rooms.length - 1];
-  // this.tiles[lastRoom.x + 1][lastRoom.y + 1].sprite.frameName = 'box';
 }
 
 Map.prototype.carveRoom = function(room) {
@@ -53,16 +65,14 @@ Map.prototype.carveRoom = function(room) {
   }
 }
 
-Map.prototype.fillWithTile = function(tileSet, tileName, blocksMovement) {
+Map.prototype.fillWithTile = function(tileName, blocksMovement) {
   for (var col_index = 0; col_index < this.width; col_index++) {
-    var row = [];
     for (var row_index = 0; row_index < this.height; row_index++) {
-      var sprite = this.state.add.sprite(col_index * TILE_WIDTH, row_index * TILE_HEIGHT, tileSet);
-      sprite.frameName = tileName;
-      var tile = new Tile(sprite, col_index, row_index, blocksMovement);
-      row.push(tile)
+      var tile = this.tiles[col_index][row_index];
+      tile.sprite.frameName = tileName;
+      tile.blocksMovement = blocksMovement;
+      tile.visited = false;
     }
-    this.tiles.push(row);
   }
 }
 

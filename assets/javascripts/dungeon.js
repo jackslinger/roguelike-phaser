@@ -6,10 +6,8 @@ dungeonState = {
   create: function () {
     this.world.setBounds(0, 0, DUNGEON_WIDTH * TILE_WIDTH, DUNGEON_HEIGHT * TILE_HEIGHT);
 
-    var map = new Map(this, DUNGEON_WIDTH, DUNGEON_HEIGHT);
-    map.fillWithTile('dungeon_tiles16', 'wall', true);
+    var map = new Map(this, DUNGEON_WIDTH, DUNGEON_HEIGHT, 'dungeon_tiles16');
     // map.fillWithTile('dungeon_tiles16', 'white', false);
-    map.wallEdges();
 
     var player = new Actor(this.add.sprite(0, 0, 'face'), 3, 3);
     game.camera.follow(player.sprite);

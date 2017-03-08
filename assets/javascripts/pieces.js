@@ -54,6 +54,10 @@ Board.prototype.movePiece = function(piece, dx, dy) {
   }
   var newX = piece.x + dx;
   var newY = piece.y + dy;
+  if (this.map.stairX === newX && this.map.stairY === newY) {
+    this.map.generate(this.player);
+  }
+
   if (this.map.tileClear(newX, newY)) {
     var blockingActor = this.blockedByActor(newX, newY);
     if (blockingActor) {
