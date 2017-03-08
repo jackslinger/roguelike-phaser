@@ -20,16 +20,21 @@ Map.prototype.generate = function(player) {
   this.wallEdges();
 
   this.generateMaze(rooms);
-  player.x = (rooms[0].x + 1) * TILE_WIDTH;
-  player.y = (rooms[0].y + 1) * TILE_HEIGHT;
   for (var i = 0; i < rooms.length; i++) {
-    this.connectRoom(rooms[i]);
+    var room = rooms[i];
+    this.connectRoom(room);
+    if (i === 0) {
+      player.x = (room.x + 1);
+      player.y = (room.y + 1);
+    } else {
+      this.populateRoom(room);
+    }
   }
 
   this.finalise();
 
-  var lastRoom = rooms[rooms.length - 1];
-  this.tiles[lastRoom.x + 1][lastRoom.y + 1].sprite.frameName = 'box';
+  // var lastRoom = rooms[rooms.length - 1];
+  // this.tiles[lastRoom.x + 1][lastRoom.y + 1].sprite.frameName = 'box';
 }
 
 Map.prototype.carveRoom = function(room) {
@@ -155,7 +160,6 @@ Map.prototype.generateMaze = function(rooms) {
       }
     }
   }
-
 }
 
 Map.prototype.connectRoom = function(room) {
@@ -193,6 +197,10 @@ Map.prototype.connectRoom = function(room) {
     randomWall.blocksMovement = false;
     randomWall.sprite.frameName = 'white';
   }
+}
+
+Map.prototype.populateRoom = function(room) {
+  this.board.addActor('cross', room.x + 1, room.y + 1);
 }
 
 Map.prototype.finalise = function() {

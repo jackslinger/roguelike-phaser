@@ -17,11 +17,41 @@ Object.defineProperty(Actor.prototype, 'y', {
 var Board = function(game, map, player) {
   this.game = game;
   this.map = map;
+  this.map.board = this;
   this.player = player;
   this.monsters = [];
 }
 
+Board.prototype.processMonsterTurns = function() {
+  for (var i = 0; i < this.monsters.length; i++) {
+    var monster = this.monsters[i];
+    var dx = this.player.x - monster.x;
+    var dy = this.player.y - monster.y;
+
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+      dx = getRandomInt(-1, 1);
+      dy = getRandomInt(-1, 1);
+    } else {
+      dx = Math.sign(dx);
+      dy = Math.sign(dy);
+    }
+
+    if (dx != 0 && dy != 0) {
+      if (getRandomInt(0, 1)){
+        dx = 0;
+      } else {
+        dy = 0;
+      }
+    }
+
+    this.movePiece(monster, dx, dy);
+  }
+}
+
 Board.prototype.movePiece = function(piece, dx, dy) {
+  if (dx == 0 && dy == 0) {
+    return true;
+  }
   var newX = piece.x + dx;
   var newY = piece.y + dy;
   if (this.map.tileClear(newX, newY)) {
